@@ -69,4 +69,4 @@ class AlbumManager(object):
 
     def get_album_image_format(self):
         return self.album_art[self.album_art[-5:].index('.'):]
-    
+

@@ -1,21 +1,22 @@
 __author__ = 'dougnappier'
 
 import pylast
-import soco
-import pychromecast
+#import soco
+#from sonosmanager import SonosManager
+#import pychromecast
 import time
-from colorweave import palette
-from rgb_cie import Converter
-import phue
+#from colorweave import palette
+#from rgb_cie import Converter
+#import phue
 import traceback
-import colorsys
-from wirelesslights import WirelessLights
+#import colorsys
+#from wirelesslights import WirelessLights
 
-LASTFM_API_KEY = 'xxxxxxxxxx'
-LASTFM_API_SECRET = 'xxxxxxxx'
-lastfm_username = 'xxxxxxxxx'
-lastfm_password = 'xxxxxxxxxxx'
-HUE_IP_ADDRESS = '192.168.1.1'
+LASTFM_API_KEY = 'f6c7a0a15aa64042bfe5367784e120cb'
+LASTFM_API_SECRET = '93de2dd7a2d0b009c966f12b81935b7b'
+lastfm_username = 'dnappier'
+lastfm_password = 'Reyron!120'
+HUE_IP_ADDRESS = '192.168.11.146'
 WHITE = [.3174, .3207]
 
 active_hue_lights = []
@@ -108,116 +109,98 @@ def setupChromecast(attempts=1000):
     cast.wait()
     return cast
 
+# # find the sonos system and pick the highest priority room
+# sonos = SonosManager(['Living Room', 'Kitchen'])
 
-activeZone = None
-activeZoneIndex = -1
-zones = list(soco.discover())
+# network = setupLastFm()
+# cast = setupChromecast()
+# castViewer = cast.media_controller
+# track = {'title': 'NA', 'artist': 'NA', 'album': 'NA'}
+# b = setupHue()
+# active_hue_lights = b.lights
+# duration = ''
+# failed_album_artwork = False
+# is_paused = True
+# while 1:
+#     # get the current album is being played in currently selected sonos speaker
+#     track = sonos.wait_for_next_track()
+#     if not sonos.get_paused_state():
+#         if ' (' in track['title']:
+#             # this is usually a featuring, which lastfm doesn't like
+#             # so we strip off from that space to the end of the string
+#             title = track['title'][:track['title'].index(' (')]
+#         else:
+#             title = track['title']
+#         # get the album information for this track
+#         album = pylast.Album(track['artist'], title, network)
 
-for zone in zones:
-    activeZoneIndex += 1
-    if 'livingroom' in zone.player_name.lower().replace(' ', ''):
-        activeZone = zone
+#         print('New Track by: %s, song is %s' % (track['artist'], track['title']))
+#         # get the coverimage url for the album
+#         # make sure its a valid album
+#         if len(title) > 0:
+#             try:
+#                 if not track['album_art']:
+#                     coverImage = album.get_cover_image()
+#                 else:
+#                     coverImage = track['album_art']
 
+#             except pylast.WSError:
+#                 coverImage = None
+#                 print("can't find album details for %(title)s by %(artist)s" % track)
+#             except:
+#                 # usually this is an add in our music stream
+#                 print('unknown failure')
+#                 print(track)
+#                 traceback.print_exc()
+#                 continue
+#         else:
+#             print('error: no title')
+#             continue
 
-def get_new_active_zone(available_zones):
-    new_index = 0
-    for zone in available_zones:
-        current_track = zone.get_current_track_info()
-        if current_track['title'] != '' and current_track['artist'] != '':
-            return zone, new_index
-        new_index += 1
-    return None, -1
+#         trying_to_find_image = True
+#         while trying_to_find_image:
+#             if coverImage:
+#                 dominant_colors_dict = (palette(url=coverImage, format='css3', n=10))
+#                 print dominant_colors_dict
+#                 dominant_colors = dominant_colors_dict.keys()
+#                 castViewer.play_media(coverImage, coverImage[coverImage[-5:].index('.'):])
+#                 print('Casting image %s' % coverImage)
+#                 trying_to_find_image = False
+#                 index = 0
+#                 for light in active_hue_lights:
+#                     color_str, name = filterColors(dominant_colors_dict)
+#                     print('Changing Hue color to %s' % name)
+#                     light.xy = color_str
+#                     light.on = True
+#                     light.brightness = 254
+#                     index += 1
+#             # we didn't get a valid cover image so now lets get the band image
+#             else:
+#                 # print("failed album: %s " % album.get_url())
+#                 print("Attempted Album name is %(album)s" % track)
+#                 failed_album_artwork = True
+#                 print('we will try to get the artist artwork now')
+#                 artist = network.get_artist(track['artist'])
+#                 coverImage = artist.get_cover_image()
 
-print ("The sonos room to be used is %s" % activeZone.player_name)
+#     # This means we are paused or just not playing anything
+#     else:
+#         # check if progress is being made in the song
+#         if castViewer:
+#             for light in active_hue_lights:
+#                 light.xy = color_str
+#                 light.on = True
+#                 light.brightness = 127
+#             castViewer.stop()
+#             cast.quit_app()
+#             castViewer = None
+#             is_paused = True
 
-network = setupLastFm()
-cast = setupChromecast()
-castViewer = cast.media_controller
-track = {'title': 'NA', 'artist': 'NA', 'album': 'NA'}
-b = setupHue()
-active_hue_lights = b.lights
-duration = ''
-failed_album_artwork = False
-is_paused = True
-while 1:
-    # get the current album being played
-    if activeZone:
-        trackNew = activeZone.get_current_track_info()
+#         # if we were paused but are now moving forward
+#         if is_paused:
+#             # This means the play button was pressed
+#             cast = setupChromecast()
+#             castViewer = cast.media_controller
+#             # make sure everything gets setup next time
+#             track = {'title': 'NA', 'artist': 'NA', 'album': 'NA'}
 
-    if trackNew['title'] != track['title'] or trackNew['artist'] != track['artist'] or trackNew['album'] != track['album']:
-        is_paused = False
-        track = trackNew
-        if ' (' in track['title']:
-            # this is usually a featuring, which lastfm doesn't like
-            # so we strip off from that space to the end of the string
-            title = track['title'][:track['title'].index(' (')]
-        else:
-            title = track['title']
-        album = pylast.Album(track['artist'], title, network)
-
-        print('New Track by: %s, song is %s' % (track['artist'], track['title']))
-        if len(title) > 0:
-            try:
-                coverImage = album.get_cover_image()
-            except pylast.WSError:
-                coverImage = None
-                print("can't find album details for %(title)s by %(artist)s" % track)
-            except:
-                # usually this is an add in our music stream
-                if track['title'] == ' ':
-                    continue
-
-                print('unknown failure')
-                print(track)
-                traceback.print_exc()
-                continue
-        else:
-            print('error: no title')
-            activeZone, activeZoneIndex = get_new_active_zone(zones)
-            continue
-        trying_to_find_image = True
-        while trying_to_find_image:
-            if coverImage:
-                dominant_colors_dict = (palette(url=coverImage, format='css3', n=10))
-                print dominant_colors_dict
-                dominant_colors = dominant_colors_dict.keys()
-                castViewer.play_media(coverImage, 'png')
-                print('Casting image %s' % coverImage)
-                trying_to_find_image = False
-                index = 0
-                for light in active_hue_lights:
-                    color_str, name = filterColors(dominant_colors_dict)
-                    print('Changing Hue color to %s' % name)
-                    light.xy = color_str
-                    light.on = True
-                    light.brightness = 254
-                    print('hue %f' %light.hue)
-                    print('saturation %f' %light.saturation)
-                    index += 1
-            else:
-                print("failed album: %s " % album.get_url())
-                print("Attempted Album name is %(album)s" % track)
-                failed_album_artwork = True
-                print('we will try to get the artist artwork now')
-                artist = network.get_artist(track['artist'])
-                coverImage = artist.get_cover_image()
-    else:
-        # check if progress is being made in the song
-        if trackNew['position'] == duration:
-            is_paused = True
-            if castViewer:
-                for light in active_hue_lights:
-                    light.xy = color_str
-                    light.on = True
-                    light.brightness = 127
-                castViewer.stop()
-                cast.quit_app()
-                castViewer = None
-        elif is_paused:
-            # This means the play button was pressed
-            cast = setupChromecast()
-            castViewer = cast.media_controller
-            # make sure everything gets setup next time
-            track = {'title': 'NA', 'artist': 'NA', 'album': 'NA'}
-    time.sleep(1.01)
-    duration = trackNew['position']

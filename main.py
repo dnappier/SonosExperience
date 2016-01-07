@@ -7,11 +7,11 @@ import pychromecast
 import time
 
 
-LASTFM_API_KEY = 'f6c7a0a15aa64042bfe5367784e120cb'
-LASTFM_API_SECRET = '93de2dd7a2d0b009c966f12b81935b7b'
-lastfm_username = 'dnappier'
-lastfm_password = 'Reyron!120'
-HUE_IP_ADDRESS = '192.168.11.146'
+LASTFM_API_KEY = 'x'
+LASTFM_API_SECRET = 'x'
+lastfm_username = 'x'
+lastfm_password = 'x'
+HUE_IP_ADDRESS = '192.168.1.146'
 WHITE = [.3174, .3207]
 
 def setupChromecast(attempts=1000):

@@ -12,6 +12,8 @@ LASTFM_API_SECRET = 'x'
 lastfm_username = 'x'
 lastfm_password = 'x'
 HUE_IP_ADDRESS = '192.168.1.146'
+#fill in here with light name or names that you want to use
+HUE_LIGHTS = ['Cabinet Lights']
 WHITE = [.3174, .3207]
 
 def setupChromecast(attempts=1000):
@@ -47,7 +49,8 @@ album_manager = AlbumManager(LASTFM_API_KEY, LASTFM_API_SECRET,
 cast = setupChromecast()
 castViewer = cast.media_controller
 track = {'title': 'NA', 'artist': 'NA', 'album': 'NA'}
-light_manager = LightManager(HUE_IP_ADDRESS, hue_lights=['Cabinet Lights'], limitlessled_groups=[5])
+# The 5 used below is for all
+light_manager = LightManager(HUE_IP_ADDRESS, hue_lights=HUE_LIGHTS, limitlessled_groups=[5])
 duration = ''
 failed_album_artwork = False
 is_paused = True

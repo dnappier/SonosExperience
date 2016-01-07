@@ -6,16 +6,17 @@ from sonosmanager import SonosManager
 import pychromecast
 import time
 from colorweave import palette
+import sys
+sys.path.insert(0, 'hue-python-rgb-converter')
 from rgb_cie import Converter
 import phue
-import traceback
 import colorsys
 from wirelesslights import WirelessLights
 
-LASTFM_API_KEY = ''
-LASTFM_API_SECRET = ''
-lastfm_username = ''
-lastfm_password = ''
+LASTFM_API_KEY = 'f6c7a0a15aa64042bfe5367784e120cb'
+LASTFM_API_SECRET = '93de2dd7a2d0b009c966f12b81935b7b'
+lastfm_username = 'dnappier'
+lastfm_password = 'Reyron!120'
 HUE_IP_ADDRESS = '192.168.11.146'
 WHITE = [.3174, .3207]
 
@@ -120,7 +121,7 @@ while 1:
     # get the current album is being played in currently selected sonos speaker
     track = sonos.wait_for_next_track()
     if not sonos.get_paused_state():
-        coverImage = album_manager.get_album_image(track)
+        coverImage = album_manager.get_album_image(**track)
 
         if coverImage:
             dominant_colors_dict = (palette(url=coverImage, format='css3', n=10))
@@ -135,7 +136,6 @@ while 1:
                 light.xy = color_str
                 light.on = True
                 light.brightness = 254
-                index += 1
 
     # This means we are paused or just not playing anything
     else:

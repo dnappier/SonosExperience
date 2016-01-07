@@ -1,4 +1,5 @@
 import pylast
+import traceback
 
 class AlbumManager(object):
     '''
@@ -14,9 +15,11 @@ class AlbumManager(object):
                                             password_hash=password_hash)
 
     def get_album_image(self, **kwargs):
+        if not len(kwargs['artist']):
+            return None
         title = ''
         if 'album_art' in kwargs.keys() and len(kwargs['album_art']) > 0:
-            self.album_image = kwargs['album_art']
+            self.album_art = kwargs['album_art']
             return kwargs['album_art']
 
         if 'title' in kwargs.keys():
@@ -41,7 +44,7 @@ class AlbumManager(object):
         except:
             # usually this is an add in our music stream
             print('AlbumManager: unknown lastfm failure')
-            print(track)
+            print(kwargs)
             traceback.print_exc()
 
         artist = self.network.get_artist(kwargs['artist'])

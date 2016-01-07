@@ -11,10 +11,11 @@ class SonosManager(object):
     This is the class that manages all of the sonos speakers and abstracts
     tracking speaker and song states
     '''
-    # poll time is 10 ms
-    POLL_DURATION = .1
-    # this is just over 1 second (1 s 10ms)
-    PAUSED_COUNT = 11
+    # poll duration is amount of time to sleep
+    POLL_DURATION = .02
+    # paused count * sleep duration is how long we let passed without noticeable
+    # progress in song before marked as paused
+    PAUSED_COUNT = 55
     def __init__(self, priority_table):
         """
         The Expected Priority table is a list with highest priority room first,
@@ -71,15 +72,15 @@ class SonosManager(object):
     def wait_for_next_track(self):
         waiting = True
         is_paused_count = 0
-        duration = '0'
+        position = '0'
         while waiting:
             track = self.get_current_track()
             if len(track['title']) == 0:
-                print('Error no title for this song, probably not playing')
                 self.get_new_active_zone()
+                # print('Error no title for this song, probably not playing')
             # check if this is an add
             elif track['title'] == ' ':
-                pass
+                self.get_new_active_zone()
             # this means a new song is playing
             elif track['title'] != self.track['title'] \
                 or track['artist'] != self.track['artist'] \
@@ -90,13 +91,13 @@ class SonosManager(object):
                 self._is_paused = False
                 return self.track
             # check to see if we are currently paused
-            elif track['duration'] == duration:
+            elif track['position'] == position:
                 # return None if paused or nothing playing
                 # if we have gone over a second with noticable progress
                 if is_paused_count == self.PAUSED_COUNT:
                     self._is_paused = True
                     is_paused_count = 0
-                    return {'paused': False}
+                    return {'paused': True}
 
                 else:
                     is_paused_count += 1
@@ -104,5 +105,5 @@ class SonosManager(object):
             else:
                 is_paused_count = 0
 
-            duration = track['duration']
+            position = track['duration']
             time.sleep(self.POLL_DURATION)

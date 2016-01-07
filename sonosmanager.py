@@ -12,10 +12,10 @@ class SonosManager(object):
     tracking speaker and song states
     '''
     # poll duration is amount of time to sleep
-    POLL_DURATION = .02
+    POLL_DURATION = .2
     # paused count * sleep duration is how long we let passed without noticeable
     # progress in song before marked as paused
-    PAUSED_COUNT = 55
+    PAUSED_COUNT = 6
     def __init__(self, priority_table):
         """
         The Expected Priority table is a list with highest priority room first,
@@ -105,5 +105,5 @@ class SonosManager(object):
             else:
                 is_paused_count = 0
 
-            position = track['duration']
+            position = track['position']
             time.sleep(self.POLL_DURATION)

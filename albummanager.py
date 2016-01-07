@@ -20,7 +20,9 @@ class AlbumManager(object):
         title = ''
         if 'album_art' in kwargs.keys() and len(kwargs['album_art']) > 0:
             self.album_art = kwargs['album_art']
-            return kwargs['album_art']
+            # this is a dirty hack for a local ip address
+            if '192.168' not in self.album_art:
+                return kwargs['album_art']
 
         if 'title' in kwargs.keys():
             if ' (' in kwargs['title']:
@@ -37,7 +39,8 @@ class AlbumManager(object):
         try:
             coverImage = album.get_cover_image()
             self.album_art = coverImage
-            return coverImage
+            if coverImage:
+                return coverImage
         except pylast.WSError:
             coverImage = None
             print("AlbumManager: can't find album details for %(title)s by %(artist)s from lastfm" % kwargs)
@@ -55,7 +58,7 @@ class AlbumManager(object):
         for album in album_list:
             if str(album[0].title).lower() in str(kwargs['album']).lower():
                 print ("AlbumManager: found album %s from the info given" % album[0].title)
-                self.album_art = album.get_cover_image()
+                self.album_art = album[0].get_cover_image()
                 return self.album_art
 
         if len(album_list) > 0:
@@ -71,5 +74,8 @@ class AlbumManager(object):
         return self.album_art
 
     def get_album_image_format(self):
-        return self.album_art[self.album_art[-5:].index('.'):]
+        try:
+            return self.album_art[self.album_art[-5:].index('.'):]
+        except ValueError:
+            return 'jpg'
 

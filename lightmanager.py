@@ -5,6 +5,7 @@ from wirelesslights import WirelessLights
 import sys
 sys.path.insert(0, 'hue-python-rgb-converter')
 from rgb_cie import Converter
+import socket
 import colorsys
 from colorweave import palette
 from wirelesslights import WirelessLights
@@ -107,7 +108,10 @@ class LightManager(object):
             if type(color) is list:
                 light.xy = color
             else:
-                light.xy = color_converter.hexToCIE1931(color)
+                try:
+                    light.xy = color_converter.hexToCIE1931(color)
+                except socket.timeout:
+                    pass
             light.brightness = 254
         elif type(light) is WirelessLights:
             light.on()

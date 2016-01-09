@@ -48,6 +48,7 @@ class SonosManager(object):
                 return zone
 
         self.active_zone = zone_save
+        print("Sonos Manager: switching to %s" % zone_save.player_name)
         return zone_save
 
     def get_paused_state(self):

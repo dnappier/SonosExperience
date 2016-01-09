@@ -7,16 +7,38 @@ import pychromecast
 import time
 
 
-LASTFM_API_KEY = 'x'
-LASTFM_API_SECRET = 'x'
-lastfm_username = 'x'
-lastfm_password = 'x'
-HUE_IP_ADDRESS = '192.168.1.146'
+LASTFM_API_KEY = ''
+LASTFM_API_SECRET = ''
+lastfm_username = ''
+lastfm_password = ''
+HUE_IP_ADDRESS = '192.168.11.146'
+SONOS_SPEAKERS = ['Kitchen', 'Living Room']
+USE_CHROMECAST = True
 #fill in here with light name or names that you want to use
 HUE_LIGHTS = ['Cabinet Lights']
 WHITE = [.3174, .3207]
 
+
+class ChromecastEmulator(object):
+    class MediaControllerEmulator(object):
+        def __init__(self):
+            pass
+
+        def stop(self):
+            return True
+
+        def play_media(self, url, format):
+            return True
+
+    def __init__(self):
+        self.media_controller = self.MediaControllerEmulator()
+
+    def quit_app(self):
+        return True
+
 def setupChromecast(attempts=1000):
+    if not USE_CHROMECAST:
+        return ChromecastEmulator()
     # setup and connect to the chromecast and return the used cast
     retry = False
     casts = pychromecast.get_chromecasts_as_dict().keys()
@@ -41,7 +63,7 @@ def setupChromecast(attempts=1000):
     return cast
 
 # find the sonos system and pick the highest priority room
-sonos = SonosManager(['Living Room', 'Kitchen'])
+sonos = SonosManager(SONOS_SPEAKERS)
 
 album_manager = AlbumManager(LASTFM_API_KEY, LASTFM_API_SECRET,
                             lastfm_username, lastfm_password)
@@ -61,7 +83,10 @@ while 1:
     if not sonos.get_paused_state():
         coverImage = album_manager.get_album_image(**track)
         if coverImage:
-            castViewer.play_media(coverImage, album_manager.get_album_image_format())
+            try:
+                castViewer.play_media(coverImage, album_manager.get_album_image_format())
+            except:
+                continue
             print('Casting image %s' % coverImage)
             light_manager.set_color_dominant_colors(coverImage)
 

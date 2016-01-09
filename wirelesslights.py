@@ -139,4 +139,10 @@ class WirelessLights(object):
             hue = hsl
 
         color = int(((-(hue - 240) % 360) / 360.0 * 255.0))
+        print("changing light to %d hue or %d byte" % (hue, color))
+
+        self.setColorInt(color)
+        time.sleep(.1)
+        self.setColorInt(color)
+        time.sleep(.1)
         self.setColorInt(color)

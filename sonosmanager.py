@@ -31,7 +31,7 @@ class SonosManager(object):
         self.active_zone = self.zones[0]
         self.active_zone = self._find_highest_priority_active_room()
         self._is_paused = False
-        self.track = self.get_current_track()
+        self.track = {'title': 'NA', 'artist': 'NA', 'album': 'NA'}
         print (self.track)
 
     def get_current_track(self):

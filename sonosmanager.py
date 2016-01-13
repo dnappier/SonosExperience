@@ -32,7 +32,7 @@ class SonosManager(object):
         self.active_zone = self._find_highest_priority_active_room()
         self._is_paused = False
         self.track = {'title': 'NA', 'artist': 'NA', 'album': 'NA'}
-        print (self.track)
+        self.position = '0'
 
     def get_current_track(self):
         return self.active_zone.get_current_track_info()
@@ -45,10 +45,10 @@ class SonosManager(object):
             track = zone.get_current_track_info()
             if len(track['title']) > 0:
                 self.active_zone = zone
+                print("Sonos Manager: switching to %s" % zone.player_name)
                 return zone
 
         self.active_zone = zone_save
-        print("Sonos Manager: switching to %s" % zone_save.player_name)
         return zone_save
 
     def get_paused_state(self):
@@ -73,7 +73,6 @@ class SonosManager(object):
     def wait_for_next_track(self):
         waiting = True
         is_paused_count = 0
-        position = '0'
         while waiting:
             track = self.get_current_track()
             if len(track['title']) == 0:
@@ -92,7 +91,7 @@ class SonosManager(object):
                 self._is_paused = False
                 return self.track
             # check to see if we are currently paused
-            elif track['position'] == position:
+            elif track['position'] == self.position:
                 # return None if paused or nothing playing
                 # if we have gone over a second with noticable progress
                 if is_paused_count == self.PAUSED_COUNT:
@@ -104,7 +103,10 @@ class SonosManager(object):
                     is_paused_count += 1
             # same song, still playing
             else:
+                if self._is_paused:
+                    self.track = {'title': 'NA', 'artist': 'NA', 'album': 'NA'}
                 is_paused_count = 0
 
-            position = track['position']
+
+            self.position = track['position']
             time.sleep(self.POLL_DURATION)

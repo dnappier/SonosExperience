@@ -101,13 +101,14 @@ class WirelessLights(object):
         self.send()
         #packet is set []
         self.packet.append(WHITE2 + ((self.group - 1)*2))
-        time.sleep(.1)
+        time.sleep(.5)
         self.send()
 
     def whiteAll(self):
         self.packet.append(WHITEALL)
         self.send()
         #packet is cleared by send
+        time.sleep(.2)
         self.packet.append(WHITEALL2)
         self.send()
 
@@ -141,8 +142,6 @@ class WirelessLights(object):
         color = int(((-(hue - 240) % 360) / 360.0 * 255.0))
         print("changing light to %d hue or %d byte" % (hue, color))
 
-        self.setColorInt(color)
-        time.sleep(.1)
         self.setColorInt(color)
         time.sleep(.1)
         self.setColorInt(color)

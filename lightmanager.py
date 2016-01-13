@@ -5,7 +5,7 @@ from wirelesslights import WirelessLights
 import sys
 sys.path.insert(0, 'hue-python-rgb-converter')
 from rgb_cie import Converter
-import socket
+import socket, urllib2
 import colorsys
 from colorweave import palette
 from wirelesslights import WirelessLights
@@ -92,6 +92,7 @@ class LightManager(object):
                 self.limitless_groups.append(w)
 
         self.lights = self.hue_lights + self.limitless_groups
+        print("LightManager: lights added together")
 
     def set_lights(self, color, brightness_percent=100):
         for light in self.lights:
@@ -124,8 +125,15 @@ class LightManager(object):
                 light.setColorHSL(self.convert_color(color))
             light.setBrightness(100)
 
-    def set_color_dominant_colors(self, url):
-        dominant_colors_dict = (palette(url=url, format='css3', n=10))
+    def set_color_dominant_colors(self, url, count=0):
+        try:
+            dominant_colors_dict = (palette(url=url, format='css3', n=10))
+        except urllib2.URLError:
+            if count == 5:
+                pass
+            else:
+                count += 1
+                return self.set_color_dominant_colors(url, count)
         print dominant_colors_dict
 
         skip_list = []

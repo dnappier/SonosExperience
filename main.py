@@ -7,15 +7,16 @@ import pychromecast
 import time
 
 
-LASTFM_API_KEY = ''
-LASTFM_API_SECRET = ''
-lastfm_username = ''
-lastfm_password = ''
+LASTFM_API_KEY = 'x'
+LASTFM_API_SECRET = 'x'
+lastfm_username = 'x'
+lastfm_password = 'x'
 HUE_IP_ADDRESS = '192.168.11.146'
 SONOS_SPEAKERS = ['Kitchen', 'Living Room']
 USE_CHROMECAST = True
 #fill in here with light name or names that you want to use
-HUE_LIGHTS = ['Cabinet Lights']
+#HUE_LIGHTS = ['Cabinet Lights', 'Table Bloom']
+HUE_LIGHTS = ['Table Bloom']
 WHITE = [.3174, .3207]
 
 
@@ -75,12 +76,20 @@ track = {'title': 'NA', 'artist': 'NA', 'album': 'NA'}
 light_manager = LightManager(HUE_IP_ADDRESS, hue_lights=HUE_LIGHTS, limitlessled_groups=[5])
 duration = ''
 failed_album_artwork = False
-is_paused = True
+is_paused = False
 
 while 1:
     # get the current album is being played in currently selected sonos speaker
     track = sonos.wait_for_next_track()
     if not sonos.get_paused_state():
+        # if we were paused but are now moving forward
+        if is_paused:
+            # This means the play button was pressed
+            cast = setupChromecast()
+            castViewer = cast.media_controller
+            # make sure everything gets setup next time
+            # track = {'title': 'NA', 'artist': 'NA', 'album': 'NA'}
+
         coverImage = album_manager.get_album_image(**track)
         if coverImage:
             try:
@@ -101,11 +110,5 @@ while 1:
             castViewer = None
             is_paused = True
 
-        # if we were paused but are now moving forward
-        if is_paused:
-            # This means the play button was pressed
-            cast = setupChromecast()
-            castViewer = cast.media_controller
-            # make sure everything gets setup next time
-            track = {'title': 'NA', 'artist': 'NA', 'album': 'NA'}
+
 
